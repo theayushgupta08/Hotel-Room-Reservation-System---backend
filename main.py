@@ -19,7 +19,7 @@ app = FastAPI(
 # Enable CORS for frontend integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://hotel-room-reservation-system-backe-iota.vercel.app/"],  # Allow all origins
+    allow_origins=["https://hotel-room-reservation-system-backe-iota.vercel.app"],  # Allow all origins
     allow_credentials=False,  # Must be False when using wildcard origins
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Explicit methods
     allow_headers=["*"],  # Allow all headers
