@@ -1,6 +1,5 @@
-from fastapi import FastAPI, HTTPException, Request
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
-from starlette.middleware.base import BaseHTTPMiddleware
 from models import (
     BookingRequest, 
     BookingResponse, 
@@ -10,7 +9,6 @@ from models import (
 )
 from booking_logic import HotelBookingSystem
 import uvicorn
-import re
 
 app = FastAPI(
     title="Hotel Room Reservation System",
@@ -18,30 +16,11 @@ app = FastAPI(
     version="1.0.0"
 )
 
-# Middleware to normalize double slashes in paths
-class NormalizePathMiddleware(BaseHTTPMiddleware):
-    async def dispatch(self, request: Request, call_next):
-        # Normalize double slashes to single slash in the path
-        original_path = request.url.path
-        if "//" in original_path:
-            normalized_path = re.sub(r"/+", "/", original_path)
-            # Create new request with normalized path
-            new_scope = dict(request.scope)
-            new_scope["path"] = normalized_path
-            # Update the raw_path as well
-            new_scope["raw_path"] = normalized_path.encode()
-            request = Request(new_scope, request.receive)
-        response = await call_next(request)
-        return response
-
-# Add path normalization middleware first
-app.add_middleware(NormalizePathMiddleware)
-
 # Enable CORS for frontend integration
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["https://hotel-room-reservation-system-backe-iota.vercel.app"],  # Frontend origin
-    allow_credentials=True,  # Can be True when using specific origins
+    allow_origins=["https://hotel-room-reservation-system-backe-iota.vercel.app"],  # Allow all origins
+    allow_credentials=False,  # Must be False when using wildcard origins
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Explicit methods
     allow_headers=["*"],  # Allow all headers
     expose_headers=["*"],  # Expose all headers
