@@ -1,5 +1,6 @@
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from mangum import Mangum
 from models import (
     BookingRequest, 
     BookingResponse,
@@ -128,6 +129,7 @@ async def get_statistics():
     """Get booking statistics"""
     return booking_system.get_statistics()
 
+handler = Mangum(app)
 
 if __name__ == "__main__":
     uvicorn.run(app, port=8000)
