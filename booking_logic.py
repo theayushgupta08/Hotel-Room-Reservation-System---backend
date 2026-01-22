@@ -1,4 +1,4 @@
-from typing import List, Dict, Tuple, Optional
+from typing import List, Dict, Tuple, Optional, Any
 from models import Room, RoomStatus
 import random
 from itertools import combinations
@@ -251,7 +251,7 @@ class HotelBookingSystem:
             room.status = RoomStatus.BOOKED
             room.guest_id = f"guest_{random.randint(1000, 9999)}"
     
-    def get_room_states(self) -> Dict[int, Dict[str, any]]:
+    def get_room_states(self) -> Dict[int, Dict[str, Any]]:
         """Get current state of all rooms"""
         states = {}
         for room_number, room in self.rooms.items():
