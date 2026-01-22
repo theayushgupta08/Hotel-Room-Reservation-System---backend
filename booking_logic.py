@@ -55,6 +55,53 @@ class HotelBookingSystem:
             horizontal_time = room1.position + room2.position  # Travel to stairs + from stairs
             return vertical_time + horizontal_time
     
+    def calculate_travel_time_from_reception(self, room: Room) -> int:
+        """
+        Calculate travel time from ground floor reception (floor 0, position 0) to a room
+        - Vertical: 2 minutes per floor (from floor 0 to room floor)
+        - Horizontal: 1 minute per room position (from stairs to room)
+        """
+        vertical_time = room.floor * 2  # From floor 0 to room floor
+        horizontal_time = room.position  # From stairs (position 0) to room position
+        return vertical_time + horizontal_time
+    
+    def get_path_from_reception(self, room: Room) -> Dict[str, Any]:
+        """
+        Get the path description from reception to a room
+        Returns a dictionary with path steps and total time
+        Reception is at floor 0, position 0 (stairs location)
+        """
+        steps = []
+        total_time = 0
+        
+        # Step 1: Go up floors (from floor 0 to room floor)
+        if room.floor > 0:
+            steps.append(f"Take stairs/lift up {room.floor} floor(s) ({room.floor * 2} minutes)")
+            total_time += room.floor * 2
+        
+        # Step 2: Walk to room from stairs (if not at position 0)
+        if room.position > 0:
+            steps.append(f"Walk {room.position} room(s) from stairs to Room {room.room_number} ({room.position} minutes)")
+            total_time += room.position
+        elif room.floor > 0:
+            steps.append(f"Room {room.room_number} is located at the stairs on Floor {room.floor}")
+        
+        # If room is on floor 0 (ground floor)
+        if room.floor == 0:
+            if room.position > 0:
+                steps.append(f"Walk {room.position} room(s) from reception to Room {room.room_number} ({room.position} minutes)")
+                total_time += room.position
+            else:
+                steps.append("Room is at the reception area")
+        
+        return {
+            "steps": steps,
+            "total_time": total_time,
+            "room_number": room.room_number,
+            "floor": room.floor,
+            "position": room.position
+        }
+    
     def calculate_total_travel_time(self, rooms: List[Room]) -> int:
         """
         Calculate total travel time for a list of rooms
@@ -155,9 +202,9 @@ class HotelBookingSystem:
         
         return best_rooms
     
-    def book_rooms(self, num_rooms: int, guest_id: Optional[str] = None) -> Tuple[List[int], int]:
+    def book_rooms(self, num_rooms: int, guest_id: Optional[str] = None) -> Tuple[List[int], int, List[Dict[str, Any]]]:
         """
-        Book rooms and return list of booked room numbers and total travel time
+        Book rooms and return list of booked room numbers, total travel time, and individual room paths
         """
         if num_rooms < 1 or num_rooms > 5:
             raise ValueError("Number of rooms must be between 1 and 5")
@@ -169,15 +216,19 @@ class HotelBookingSystem:
         
         # Book the rooms
         booked_room_numbers = []
+        room_paths = []
         for room in optimal_rooms:
             room.status = RoomStatus.BOOKED
             room.guest_id = guest_id
             booked_room_numbers.append(room.room_number)
+            # Get path from reception for each room
+            path_info = self.get_path_from_reception(room)
+            room_paths.append(path_info)
         
         # Calculate total travel time
         total_travel_time = self.calculate_total_travel_time(optimal_rooms)
         
-        return booked_room_numbers, total_travel_time
+        return booked_room_numbers, total_travel_time, room_paths
     
     def reset_all_bookings(self):
         """Reset all room bookings"""

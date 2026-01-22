@@ -21,11 +21,20 @@ class BookingRequest(BaseModel):
     guest_id: Optional[str] = None
 
 
+class RoomPathInfo(BaseModel):
+    room_number: int
+    floor: int
+    position: int
+    steps: List[str]
+    total_time: int  # in minutes
+
+
 class BookingResponse(BaseModel):
     success: bool
     message: str
     booked_rooms: List[int]
     total_travel_time: Optional[int] = None  # in minutes
+    room_paths: Optional[List[RoomPathInfo]] = None  # Path from reception to each room
 
 
 class RoomStateResponse(BaseModel):

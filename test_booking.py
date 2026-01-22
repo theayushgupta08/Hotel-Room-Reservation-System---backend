@@ -9,10 +9,12 @@ def test_basic_booking():
     
     # Test 1: Book 4 rooms on same floor
     print("Test 1: Booking 4 rooms (should be on same floor)")
-    booked_rooms, travel_time = system.book_rooms(4)
+    booked_rooms, travel_time, room_paths = system.book_rooms(4)
     print(f"Booked rooms: {booked_rooms}, Travel time: {travel_time} minutes")
+    print(f"Room paths: {len(room_paths)} paths generated")
     assert len(booked_rooms) == 4
     assert travel_time >= 0
+    assert len(room_paths) == 4
     
     # Test 2: Check room states
     print("\nTest 2: Checking room states")
@@ -32,9 +34,10 @@ def test_basic_booking():
     # Test 4: Book rooms when some are already booked
     print("\nTest 4: Booking more rooms with existing occupancy")
     try:
-        booked_rooms, travel_time = system.book_rooms(3)
+        booked_rooms, travel_time, room_paths = system.book_rooms(3)
         print(f"Booked rooms: {booked_rooms}, Travel time: {travel_time} minutes")
         assert len(booked_rooms) == 3
+        assert len(room_paths) == 3
     except ValueError as e:
         print(f"Expected error (not enough rooms): {e}")
     
